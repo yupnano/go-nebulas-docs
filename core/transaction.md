@@ -6,8 +6,14 @@
 
 其主要功能有:
 
-- 
+- `ToProto/FromProto` Transaction的序列化/反序列化(protobuf格式). 
+- `GasCountOfTxBase` 计算当前transaction的gas消耗, 包括"tx最小gas" + "数据长度消耗的gas"
+- `Sign` 对transaction进行签名.
+- `VerifyIntegrity` 验证transaction完整性, 包括验证chainId、hash、签名是否正确.
 
+- `VerifyExecution` 验证transaction 的执行过程. 并将执行结果写到WordState中.
+- 
+ 
 ### 主要数据结构
 ```golang
 // Transaction type is used to handle all transaction data.
@@ -28,3 +34,7 @@ type Transaction struct {
 	sign byteutils.Hash // Signature values
 }
 ```
+### 流程图
+
+transaction 执行流程:
+![transaction 执行流程](../resource/VerifyExecution-Transaction.png)

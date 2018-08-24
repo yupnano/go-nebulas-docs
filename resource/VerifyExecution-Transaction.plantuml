@@ -1,0 +1,52 @@
+@startuml
+'title : execution of transaction
+
+:start;
+
+  partition 基础检查，如有错误直接丢弃tx，不会上链 {
+  :check balance > gasLimit*GasPrice;
+
+  :check gasLimit >= txBaseGas;
+      note right
+        txBaseGas是每个transaction的基本gas, 包括20000/笔的基本资费+ payload长度的费用.
+        txBaseGas = MinGasCountPerTransaction + payloadLength * GasCountPerByte
+                          = 20000 + length * 1
+      end note
+
+  }
+
+  partition 执行到这里之后就会上链了 {
+  :check payload vaild;
+
+  :calculate payloadBaseGas of payload
+  gasUsed = txBaseGas + txTypeGas
+  check gasLimit > gasUsed;
+      note right
+        对于binary, txTypeGas=0; 对于call/deploy, txTypeGas=60, 作为启动NVM的消耗
+      end note
+
+  :check balance >= gasPrice * gasLimit + value.
+  then transfer value;
+
+  :calculate contract's limited gas
+  contractLimitedGas = gasLimit - gasUsed;
+      note right
+        计算可用于执行合约的gas余额: contractLimitedGas
+      end note
+
+  :execute contract;
+
+  :calculate final gas:
+  allGas = gasUsed + gasExecution
+  check gasLimit > allGas;
+      note right
+        统计全部gas消耗, 包括 基本gas + 交易类型Gas + 合约执行gas
+      end note
+
+  :execution over;
+
+  }
+
+stop
+
+@enduml
