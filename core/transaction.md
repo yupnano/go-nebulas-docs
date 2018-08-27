@@ -11,7 +11,7 @@
 - `Sign` 对transaction进行签名.
 - `VerifyIntegrity` 验证transaction完整性, 包括验证chainId、hash、签名是否正确.
 
-- `VerifyExecution` 验证transaction 的执行过程. 并将执行结果写到WordState中.
+- `VerifyExecution` 验证transaction的执行过程. 在block的验证，或xinblock的打包过程中会被执行。.
 - 
  
 ### 主要数据结构
@@ -37,4 +37,5 @@ type Transaction struct {
 ### 流程图
 
 transaction 执行流程:
-![transaction 执行流程](../resource/VerifyExecution-Transaction.png)
+
+![transaction 执行流程](../resource/Transaction-VerifyExecution.png)

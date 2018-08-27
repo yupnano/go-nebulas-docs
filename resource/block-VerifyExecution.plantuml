@@ -1,0 +1,55 @@
+@startuml
+title: Block 验证过程\nVerifyExecution
+
+start;
+
+:block.Begin()
+clone创建worldState快照;
+
+
+partition block.execute()\n验证过程 {
+:给CoinBase挖矿奖励;
+    note right
+    根据3%的年通胀率 计算,出块奖励为1.42694 nas
+    end note
+
+:创建dag.dispatcher调度器
+              执行调度器;
+    note right
+    参考dag.dispatcher:
+    dispatcher列出所有父顶点数为0的顶点,
+    这些顶点之间没有依赖关系
+    然后并发执行这些顶点.
+    endnote
+
+fork
+partition 由调度器并发调用回调函数{
+    :根据dag节点node,获取tx;
+
+    :准备执行环境
+    Prepare worldState;
+
+    partition block.ExecuteTransaction {
+    :CheckTransaction;
+    :VerifyExecution;
+    :AcceptTransaction;
+    }
+
+    :检查并更新transaction
+    txWorldState.CheckAndUpdate;
+}
+end fork
+
+:将gas奖励给CoinBase;
+:Flush WorldState;
+    note right
+    Flush()?
+    end note
+
+}
+
+:block.verifyState();
+:block.Commit();
+
+end
+@enduml

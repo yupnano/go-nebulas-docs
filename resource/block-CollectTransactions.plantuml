@@ -1,0 +1,68 @@
+
+@startuml
+title: Block打包Transaction过程\n
+
+start;
+:设定deadlineTimer, 定时结束打包;
+
+:初始化变量:
+pool = block.txPool
+dag = dag.NewDag()
+transactions = []*Transaction{/}
+fromBlacklist = new(sync.Map)
+toBlacklist = new(sync.Map)
+parallelCh = make(chan bool, ParallelNum)
+mergeCh = make(chan bool, 1)
+over = false;
+
+fork
+    :等待定时结束:
+    <b>over=true
+    block.transactions = transactions
+    block.dependency = dag;
+
+fork again
+    repeat
+        :是否over
+        取出一条transaction
+        tx := pool.PopWithBlacklist;
+            note right
+            黑名单Blacklist是为了避免并发执行两条相关的tx。
+            它会暂存当前正在处理的tx的address,
+            每当从TransactionPool取tx时,
+            需要判断from/to address不在blackList中。
+            end note
+
+        fork
+        partition 并发执行(由parallelCh控制) {
+            :是否over
+            准备执行环境
+            prepare WorldState;
+
+            :是否over
+            执行transaction
+            block.ExecuteTransaction(tx, txWS);
+
+            :是否over
+            检查并更新transaction
+			         dependency, err := txWorldState.CheckAndUpdate()
+            将tx加入transactions
+            将txhash加入DAG;
+            note right
+            -- dependency是与当前交易有依赖关系的txHash列表.
+            -- 将该交易添加到DAG后, 要创建dependency中的txHash
+            到该交易的边(成为该tx的父顶点);
+            -- 如果DAG中某个tx没有父顶点，那么该tx是独立的，
+            可以新建goroutinue并发处理。
+            end note
+
+        }
+        fork end
+    repeat while()
+
+    detach
+
+fork end
+end
+
+@enduml

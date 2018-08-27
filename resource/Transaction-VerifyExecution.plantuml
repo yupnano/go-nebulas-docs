@@ -15,7 +15,7 @@
 
   }
 
-  partition 执行到这里之后就会上链了 {
+  partition 执行到这里之后就会上链了。\n如果某一步出错就会记录相应的execute_Error {
   :check payload vaild;
 
   :calculate payloadBaseGas of payload
