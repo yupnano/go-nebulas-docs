@@ -38,4 +38,4 @@ type Transaction struct {
 
 transaction 执行流程:
 
-![transaction 执行流程](../resource/Transaction-VerifyExecution.png)
+![transaction 执行流程](../resource/Transaction-VerifyExecution.svg)
