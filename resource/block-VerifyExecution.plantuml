@@ -10,16 +10,14 @@ clone创建worldState快照;
 partition block.execute()\n验证过程 {
 :给CoinBase挖矿奖励;
     note right
-    根据3%的年通胀率 计算,出块奖励为1.42694 nas
+    根据3%的年通胀率计算,
+    出块奖励为 1.42694 nas
     end note
 
 :创建dag.dispatcher调度器
               执行调度器;
     note right
-    参考dag.dispatcher:
-    dispatcher列出所有父顶点数为0的顶点,
-    这些顶点之间没有依赖关系
-    然后并发执行这些顶点.
+    参考dag.dispatcher
     endnote
 
 fork
