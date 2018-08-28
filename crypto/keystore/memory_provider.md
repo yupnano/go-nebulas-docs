@@ -30,8 +30,8 @@ type MemoryProvider struct {
 }
 ```
 
-- `entries map[string]Entry` map结构, key是address, value是entry结构, 主要是加密后的私钥信息.
--  `cipher *cipher.Cipher` 用于加密私钥的加密算法.
+- `entries map[string]Entry` map结构, key是address, value是entry结构, 主要是加密后的私钥信息。
+-  `cipher *cipher.Cipher` 用于加密私钥的加密算法。
 
 ```golang
 // Entry keeps in memory

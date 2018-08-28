@@ -17,7 +17,7 @@ over = false;
 
 fork
     :等待定时结束:
-    <b>over=true
+    =over=true
     block.transactions = transactions
     block.dependency = dag;
 
@@ -36,25 +36,23 @@ fork again
         fork
         partition 并发执行(由parallelCh控制) {
             :是否over
-            准备执行环境
+            =准备执行环境
             prepare WorldState;
 
             :是否over
-            执行transaction
+            =执行transaction
             block.ExecuteTransaction(tx, txWS);
 
-            :是否over
-            检查并更新transaction
-			         dependency, err := txWorldState.CheckAndUpdate()
+            :是否over？
+            =检查并更新transaction
+            检查依赖关系（dependency是与当前交易有依赖关系的tx列表）
+			         dependency = txWorldState.CheckAndUpdate()
+
             将tx加入transactions
-            将txhash加入DAG;
-            note right
-            -- dependency是与当前交易有依赖关系的txHash列表.
-            -- 将该交易添加到DAG后, 要创建dependency中的txHash
-            到该交易的边(成为该tx的父顶点);
-            -- 如果DAG中某个tx没有父顶点，那么该tx是独立的，
-            可以新建goroutinue并发处理。
-            end note
+            将tx加入DAG
+            在DAG中创建dependency中的tx到该交易的边(创建依赖关系);
+
+            :是否over？;
 
         }
         fork end

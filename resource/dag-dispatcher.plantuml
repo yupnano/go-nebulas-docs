@@ -1,0 +1,50 @@
+
+@startuml
+title: DAG dispatcher 调度流程\n
+
+start;
+partition run{
+:将DAG node转为task;
+:将所有依赖数为0的task.node放入queueCh;
+}
+
+partition execute{
+:取并发数目 dp.concurrency;
+
+split
+    :等待所有task处理完成
+    <-dp.finishCH;
+split again
+    :根据并发数目运行gorutinue;
+    fork
+        repeat
+        split
+            :<-dp.quitCh
+            是否退出goroutinue;
+            end;
+
+        split again
+            :<-dp.queueCh
+            从dp.queueCh中取出一个node,
+            调用回调函数cb来处理;
+
+            :cb执行后遍历该node的子node:
+            将子node依赖减1
+            如果依赖降为0，则push到queueCh
+            如果已完成task数目=task总数，则dispatcher执行完成;
+
+        end split
+        repeat while()
+
+    detach
+    fork end
+    :设定执行时间timer (elapseInMs)
+    定时结束dispatcher, 并返回错误ErrTimeout;
+    stop
+
+end split
+}
+
+end
+
+@enduml

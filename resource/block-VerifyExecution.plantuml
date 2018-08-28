@@ -48,8 +48,12 @@ end fork
 
 }
 
-:block.verifyState();
-:block.Commit();
+:block.verifyState()
+验证执行后的AccountsRoot、TxsRoot、
+EventsRoot、ConsensusRoot是否正确;
+
+:block.Commit()
+保存执行结果;
 
 end
 @enduml

@@ -4,10 +4,6 @@
 ### 功能描述
 Dispatcher 调度器按照指定的并发度,按照DAG指定的依赖关系,执行block中的交易。
 
-其主要功能有:
-
--
-
 
 ### 主要数据结构
 
@@ -38,4 +34,6 @@ type Task struct {
 ```
 
 ### 流程图
+Dispatcher 调度流程
 
+![](../../resource/dag-dispatcher.png)

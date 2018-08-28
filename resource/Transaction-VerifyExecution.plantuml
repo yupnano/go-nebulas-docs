@@ -1,38 +1,43 @@
 @startuml
 'title : execution of transaction
 
-:start;
+start;
 
   partition 基础检查，如有错误直接丢弃tx，不会上链 {
-  :check balance > gasLimit*GasPrice;
+  :检查余额
+  check balance > gasLimit*GasPrice;
 
-  :check gasLimit >= txBaseGas;
+  :检查gasLimit是否足够tx基本gas
+  check gasLimit >= txBaseGas;
       note right
-        txBaseGas是每个transaction的基本gas, 包括20000/笔的基本资费+ payload长度的费用.
-        txBaseGas = MinGasCountPerTransaction + payloadLength * GasCountPerByte
-                          = 20000 + length * 1
+        txBaseGas是每个transaction的基本gas,
+        包括20000/笔的基本资费+ payload长度的费用.
+         = MinGasCountPerTransaction + payloadLength * GasCountPerByte
+         = 20000 + length * 1
       end note
 
   }
 
   partition 执行到这里之后就会上链了。\n如果某一步出错就会记录相应的execute_Error {
-  :check payload vaild;
+  :检查payload是否有错
+  check payload vaild;
 
   :calculate payloadBaseGas of payload
+  计算payload类型的基本gas消耗
   gasUsed = txBaseGas + txTypeGas
   check gasLimit > gasUsed;
       note right
-        对于binary, txTypeGas=0; 对于call/deploy, txTypeGas=60, 作为启动NVM的消耗
+        对于binary, txTypeGas=0;
+        对于call/deploy, txTypeGas=60, 作为启动NVM的消耗
       end note
 
-  :check balance >= gasPrice * gasLimit + value.
+  :检查账户余额是否足够，并执行转账
+  balance >= gasPrice * gasLimit + value.
   then transfer value;
 
-  :calculate contract's limited gas
-  contractLimitedGas = gasLimit - gasUsed;
-      note right
-        计算可用于执行合约的gas余额: contractLimitedGas
-      end note
+  :计算可用于执行合约的gas余额: contractLimitedGas
+  contractLimitedGas = gasLimit - gasUsed
+  判断余额是否大于零;
 
   :execute contract;
 
@@ -40,7 +45,8 @@
   allGas = gasUsed + gasExecution
   check gasLimit > allGas;
       note right
-        统计全部gas消耗, 包括 基本gas + 交易类型Gas + 合约执行gas
+        统计全部gas消耗,
+        包括 基本gas + 交易类型Gas + 合约执行gas
       end note
 
   :execution over;
