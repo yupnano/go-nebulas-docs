@@ -36,4 +36,25 @@ type Task struct {
 ### 流程图
 Dispatcher 调度流程
 
-![](../../resource/dag-dispatcher.png)
+![](../../resource/dag-dispatcher.svg)
+
+
+以下面的DAG为例简单说明一下执行过程。
+```
+/*
+         1             12
+        / \            / \
+       2   3          13 14
+      /   / \         /
+     4   5   6       15
+    /   / \ /  \
+   7   8   9   10
+
+*/
+```
+1、首先，node1、node12依赖数为0，会被放入queueCH中执行。
+2、node1执行之后，其子节点node2、3依赖数减1，在这里其依赖数变为0，会被放入queueCH中被执行。
+3、以此类崔，每个节点只能在其父节点被执行后才会放入queueCh中被执行。以node9为例，只有node5、6都执行之后才会被放入queueCH
+中。
+
+
